@@ -10,7 +10,6 @@ import {
   FaPhone,
   FaClock,
   FaLandmark,
-  FaEnvelope,
 } from 'react-icons/fa';
 
 const CountryModal = ({ country, onClose }) => {
@@ -20,7 +19,6 @@ const CountryModal = ({ country, onClose }) => {
     ? `${country.idd.root}${country.idd.suffixes?.[0] || ''}`
     : 'N/A';
 
-  // Format currencies
   const formatCurrencies = () => {
     if (!country.currencies) return 'N/A';
     return Object.entries(country.currencies)
@@ -30,7 +28,6 @@ const CountryModal = ({ country, onClose }) => {
       .join(', ');
   };
 
-  // Format native names
   const formatNativeNames = () => {
     if (!country.name.nativeName) return 'N/A';
     return Object.values(country.name.nativeName)
@@ -38,7 +35,6 @@ const CountryModal = ({ country, onClose }) => {
       .join(', ');
   };
 
-  // Format borders
   const formatBorders = () => {
     if (!country.borders || country.borders.length === 0) return 'None';
     return country.borders.join(', ');
@@ -57,7 +53,7 @@ const CountryModal = ({ country, onClose }) => {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm"
+        className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm px-4"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -65,7 +61,7 @@ const CountryModal = ({ country, onClose }) => {
         onClick={onClose}
       >
         <motion.div
-          className="bg-white max-w-6xl w-full rounded-xl overflow-hidden shadow-2xl relative z-10"
+          className="bg-white w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-6xl rounded-xl overflow-hidden shadow-2xl relative z-10"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
@@ -80,7 +76,7 @@ const CountryModal = ({ country, onClose }) => {
           </button>
 
           <div className="flex flex-col lg:flex-row">
-            {/* Flag Section */}
+            {/* Flag */}
             <div className="w-full lg:w-2/5 h-64 lg:h-auto bg-gray-100 flex items-center justify-center">
               <img
                 src={country.flags.png}
@@ -91,14 +87,14 @@ const CountryModal = ({ country, onClose }) => {
                 <h1 className="text-3xl font-bold text-gray-900">
                   {country.name.common}
                 </h1>
-                <p className="text-gray-700 whitespace-normal break-words max-w-xs">
+                <p className="text-gray-700 break-words max-w-xs">
                   {country.name.official}
                 </p>
               </div>
             </div>
 
-            {/* Details Section */}
-            <div className="w-full lg:w-3/5 p-6 lg:p-8 overflow-y-auto max-h-[80vh]">
+            {/* Details */}
+            <div className="w-full lg:w-3/5 p-4 sm:p-6 lg:p-8 overflow-y-auto max-h-[80vh]">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <InfoCard
                   icon={<FaMapMarkerAlt />}
@@ -149,7 +145,6 @@ const CountryModal = ({ country, onClose }) => {
                   title="Timezones"
                   value={country.timezones.join(', ')}
                 />
-                {/* New Info Cards */}
                 <InfoCard
                   icon={<FaMoneyBillWave />}
                   title="Currencies"

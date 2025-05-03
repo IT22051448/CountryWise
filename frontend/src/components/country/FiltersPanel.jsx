@@ -23,11 +23,9 @@ const FiltersPanel = ({
   const [continentSearch, setContinentSearch] = useState('');
   const [languageSearch, setLanguageSearch] = useState('');
 
-  // Filter continents and languages based on search
   const filteredContinents = availableContinents.filter((cont) =>
     cont.toLowerCase().includes(continentSearch.toLowerCase())
   );
-
   const filteredLanguages = availableLanguages.filter((lang) =>
     lang.toLowerCase().includes(languageSearch.toLowerCase())
   );
@@ -41,7 +39,6 @@ const FiltersPanel = ({
     }
   }, [searchTerm]);
 
-  // Population options for dropdown
   const populationOptions = [
     { label: '0', value: 0 },
     { label: '10M', value: 10000000 },
@@ -52,7 +49,6 @@ const FiltersPanel = ({
     { label: '1.5B', value: 1500000000 },
   ];
 
-  // Timezone options for dropdown
   const timezoneOptions = Array.from({ length: 27 }, (_, i) => i - 12).map(
     (tz) => ({
       label: tz >= 0 ? `UTC+${tz}` : `UTC${tz}`,
@@ -61,7 +57,11 @@ const FiltersPanel = ({
   );
 
   return (
-    <div className="w-full lg:w-1/4 p-4 bg-white border-r border-gray-200 ">
+    <div
+      className={`${
+        showFilters ? 'fixed inset-0 bg-white z-40 overflow-auto p-4' : 'hidden'
+      } lg:static lg:block lg:w-1/4 p-4 bg-white border-r border-gray-200 transition-transform`}
+    >
       <div className="sticky top-4 flex flex-col h-[calc(100vh-32px)]">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-800 flex items-center">
@@ -69,7 +69,7 @@ const FiltersPanel = ({
           </h2>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="lg:hidden text-gray-500 hover:text-blue-600"
+            className="block lg:hidden ml-auto text-gray-500 hover:text-blue-600"
           >
             {showFilters ? <FiChevronUp /> : <FiChevronDown />}
           </button>
@@ -335,13 +335,13 @@ const FiltersPanel = ({
           <div className="flex justify-between space-x-3">
             <button
               onClick={resetFilters}
-              className="flex-1 py-2.5 bg-gray-300 hover:bg-gray-400 border border-gray-300 rounded-md text-sm font-medium text-black  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+              className="flex-1 py-2.5 bg-gray-300 hover:bg-gray-400 border border-gray-300 rounded-md text-sm font-medium text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
             >
               Reset
             </button>
             <button
               onClick={applyFilters}
-              className="flex-1 py-2.5 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 flex items-center justify-center"
+              className="flex-1 py-2.5 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 flex items-center justify-center"
             >
               Apply Filters
             </button>
@@ -349,11 +349,9 @@ const FiltersPanel = ({
         </div>
       </div>
 
-      {/* Custom scrollbar */}
       <style jsx>{`
         .custom-scroll::-webkit-scrollbar {
           width: 6px;
-          height: 6px;
         }
         .custom-scroll::-webkit-scrollbar-track {
           background: #f1f1f1;

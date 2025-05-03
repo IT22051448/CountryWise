@@ -51,12 +51,11 @@ const CountryPage = () => {
         formatTimezone={formatTimezone}
         applyFilters={applyFilters}
         resetFilters={resetFilters}
-        filteredCount={filteredCountries.length}
         showFilters={showFilters}
         setShowFilters={setShowFilters}
       />
 
-      <div className="w-full lg:w-3/4 p-6">
+      <div className="w-full lg:w-3/4 px-4 sm:px-6 lg:px-8 py-6">
         {error && (
           <div className="bg-red-50 text-red-700 p-3 mb-4 rounded">
             Error: {error}

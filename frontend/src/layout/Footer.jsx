@@ -12,8 +12,8 @@ const Footer = () => {
     <footer className="bg-gray-800 text-white pt-8 pb-6">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
-          {/* Brand and copyright */}
-          <div className="mb-6 md:mb-0">
+          {/* Brand */}
+          <div className="mb-6 md:mb-0 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start">
               <FaGlobe className="text-2xl mr-2 text-white" />
               <span className="text-xl font-bold">CountryWise</span>
@@ -23,8 +23,8 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* API Attribution */}
-          <div className="mb-6 md:mb-0 text-center md:text-left">
+          {/* Attribution */}
+          <div className="mb-6 md:mb-0 text-center">
             <p className="text-sm font-medium mb-2">Powered by</p>
             <a
               href="https://restcountries.com"
@@ -37,8 +37,8 @@ const Footer = () => {
             </a>
           </div>
 
-          {/* Social Links */}
-          <div className="flex space-x-4">
+          {/* Social */}
+          <div className="flex space-x-4 justify-center md:justify-end">
             <a
               href="#"
               className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all"
@@ -49,7 +49,7 @@ const Footer = () => {
             <a
               href="#"
               className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all"
-              aria-label="FaceBook"
+              aria-label="Facebook"
             >
               <FaFacebook />
             </a>
