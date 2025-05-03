@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FaGlobe,
   FaCity,
@@ -9,43 +9,7 @@ import {
   FaMoneyBillWave,
   FaFlag,
 } from 'react-icons/fa';
-
-const AnimatedLine = ({ text, start, onComplete, icon }) => {
-  const [displayed, setDisplayed] = useState('');
-
-  useEffect(() => {
-    let i = 0;
-    let interval;
-
-    if (start) {
-      setDisplayed('');
-      interval = setInterval(() => {
-        i++;
-        setDisplayed(text.slice(0, i));
-        if (i >= text.length) {
-          clearInterval(interval);
-          onComplete();
-        }
-      }, 20);
-    }
-
-    return () => clearInterval(interval);
-  }, [text, start]);
-
-  const colonIndex = displayed.indexOf(':');
-  const label = colonIndex !== -1 ? displayed.slice(0, colonIndex + 1) : '';
-  const value = colonIndex !== -1 ? displayed.slice(colonIndex + 1) : displayed;
-
-  return (
-    <div className="flex items-start mb-2">
-      <div className="text-blue-600 mr-2 mt-0.5">{icon}</div>
-      <p className="text-sm flex-1">
-        <span className="text-gray-700 font-semibold">{label}</span>
-        <span className="text-gray-900 font-medium">{value}</span>
-      </p>
-    </div>
-  );
-};
+import AnimatedLine from './AnimatedLine';
 
 const CountryDetailsPanel = ({ country }) => {
   const [currentLine, setCurrentLine] = useState(0);
@@ -70,7 +34,6 @@ const CountryDetailsPanel = ({ country }) => {
     currencies,
     flags,
   } = country;
-
   const languageList = languages ? Object.values(languages).join(', ') : 'N/A';
   const currencyList = currencies
     ? Object.values(currencies)
@@ -79,10 +42,10 @@ const CountryDetailsPanel = ({ country }) => {
     : 'N/A';
 
   const lines = [
-    { text: `Name: ${name?.common || 'N/A'}`, icon: <FaGlobe size={14} /> },
+    { text: `Name: ${name.common || 'N/A'}`, icon: <FaGlobe size={14} /> },
     { text: `Capital: ${capital?.[0] || 'N/A'}`, icon: <FaCity size={14} /> },
     {
-      text: `Population: ${population?.toLocaleString() || 'N/A'}`,
+      text: `Population: ${population.toLocaleString() || 'N/A'}`,
       icon: <FaUsers size={14} />,
     },
     { text: `Region: ${region || 'N/A'}`, icon: <FaMapMarkerAlt size={14} /> },
@@ -98,7 +61,14 @@ const CountryDetailsPanel = ({ country }) => {
   ];
 
   return (
-    <div className="absolute top-0 right-0 h-auto w-80 bg-white p-4 overflow-y-auto shadow-lg z-10 rounded-lg mt-12 mr-3 border border-gray-100">
+    <div
+      className="
+        fixed inset-x-0 bottom-0 sm:top-0 sm:bottom-auto sm:right-0
+        w-full sm:w-80 bg-white p-4 overflow-y-auto shadow-lg z-10
+        rounded-t-lg sm:rounded-lg sm:mt-12 sm:mr-3 border border-gray-100
+        max-h-1/2 sm:max-h-[80vh]
+      "
+    >
       <div className="flex items-center mb-4">
         <FaFlag className="text-red-500 mr-2" size={18} />
         <h2 className="text-xl font-bold text-gray-800">Country Details</h2>
@@ -108,7 +78,7 @@ const CountryDetailsPanel = ({ country }) => {
         <div className="mb-4 flex justify-center">
           <img
             src={flags.png}
-            alt={name?.common}
+            alt={name.common}
             className="w-32 h-auto rounded-md shadow-sm border border-gray-200"
           />
         </div>
@@ -119,11 +89,11 @@ const CountryDetailsPanel = ({ country }) => {
           <FaGlobe className="mr-1.5" size={14} /> Basic Info
         </h3>
         <div className="space-y-1.5">
-          {lines.slice(0, 4).map((line, index) => (
+          {lines.slice(0, 4).map((line, idx) => (
             <AnimatedLine
-              key={`${panelId}-${index}`}
+              key={`${panelId}-${idx}`}
               text={line.text}
-              start={currentLine === index}
+              start={currentLine === idx}
               onComplete={() => setCurrentLine((prev) => prev + 1)}
               icon={line.icon}
             />
@@ -136,11 +106,11 @@ const CountryDetailsPanel = ({ country }) => {
           <FaLanguage className="mr-1.5" size={14} /> Cultural Info
         </h3>
         <div className="space-y-1.5">
-          {lines.slice(4).map((line, index) => (
+          {lines.slice(4).map((line, idx) => (
             <AnimatedLine
-              key={`${panelId}-${index + 4}`}
+              key={`${panelId}-${idx + 4}`}
               text={line.text}
-              start={currentLine === index + 4}
+              start={currentLine === idx + 4}
               onComplete={() => setCurrentLine((prev) => prev + 1)}
               icon={line.icon}
             />

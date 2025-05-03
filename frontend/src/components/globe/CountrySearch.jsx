@@ -2,8 +2,8 @@ import React from 'react';
 import { FaSearch, FaGlobeAmericas } from 'react-icons/fa';
 
 const CountrySearch = ({ countryName, setCountryName, onSearch, message }) => (
-  <div className="flex justify-center mt-12 px-4">
-    <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md border border-gray-100">
+  <div className="fixed inset-x-0 top-4 px-4 sm:static sm:px-0 sm:mt-12 z-20 flex justify-center sm:justify-start">
+    <div className="w-full max-w-md sm:w-auto bg-white rounded-xl shadow-lg p-6 border border-gray-100">
       <div className="flex flex-col items-center mb-6">
         <div className="bg-gradient-to-r from-green-500 to-blue-500 p-3 rounded-full mb-3">
           <FaGlobeAmericas className="text-white text-xl" />
@@ -27,7 +27,7 @@ const CountrySearch = ({ countryName, setCountryName, onSearch, message }) => (
             value={countryName}
             onChange={(e) => setCountryName(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && onSearch()}
-            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
           />
         </div>
 

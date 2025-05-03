@@ -16,7 +16,7 @@ const Globe = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
 
-  const [fetchByName, { isLoading }] = useLazyGetCountriesByNameQuery();
+  const [fetchByName] = useLazyGetCountriesByNameQuery();
 
   const handleSearch = async () => {
     setMessage('');
@@ -30,23 +30,19 @@ const Globe = () => {
       if (data.length > 1) {
         setMatches(data);
         setShowModal(true);
-        setMessage('Multiple countries match. Please select.');
-        setSelectedCountry(null);
+        setMessage('Multiple matches—please select.');
       } else if (data.length === 1) {
         const [lat, lng] = data[0].latlng;
         setCountryCoordinates({ lat, lng });
         setShowMarker(true);
-        setMessage('Location found!');
-        setShowModal(false);
         setSelectedCountry(data[0]);
+        setMessage(`Showing: ${data[0].name.common}`);
       } else {
         setMessage('Country not found!');
-        setSelectedCountry(null);
-        setShowMarker(false);
       }
-    } catch (error) {
-      console.error('Error:', error);
-      setMessage('Error fetching country data.');
+    } catch (err) {
+      console.error(err);
+      setMessage('Error fetching data.');
     }
   };
 
@@ -61,21 +57,23 @@ const Globe = () => {
 
   return (
     <div className="relative h-full w-full bg-[#0a192f]">
-      <div className="absolute top-4 left-4 z-10">
-        <CountrySearch
-          countryName={countryName}
-          setCountryName={setCountryName}
-          onSearch={handleSearch}
-          message={message}
-        />
-      </div>
+      {/* Search bar */}
+      <CountrySearch
+        countryName={countryName}
+        setCountryName={setCountryName}
+        onSearch={handleSearch}
+        message={message}
+      />
 
+      {/* Details sidebar / bottom panel */}
       <CountryDetailsPanel country={selectedCountry} />
 
-      {showModal && matches.length > 1 && (
+      {/* Disambiguation modal */}
+      {showModal && (
         <CountrySelectModal matches={matches} onSelect={handleCountrySelect} />
       )}
 
+      {/* 3D Globe */}
       <Canvas
         className="absolute inset-0"
         camera={{ position: [0, 0, 12], fov: 45 }}
