@@ -13,130 +13,138 @@ import {
 const Header = () => {
   const dispatch = useDispatch();
   const { token, expiry } = useSelector((state) => state.auth);
-
   const loggedIn =
     Boolean(token) && Boolean(expiry) && Date.now() < Number(expiry);
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const toggleMenu = () => setMenuOpen((open) => !open);
   const handleLogout = () => {
     dispatch(logout());
+    setMenuOpen(false);
   };
 
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const NavLinks = (
-    <>
-      <Link
-        to="/countries"
-        className="text-gray-300 hover:text-blue-400 font-medium transition duration-200 flex items-center mb-4 md:mb-0"
-      >
-        <span className="mr-1">🌎</span>
-        Countries
-      </Link>
-      {loggedIn && (
-        <Link
-          to="/collection"
-          className="text-gray-300 hover:text-blue-400 font-medium transition duration-200 flex items-center mb-4 md:mb-0"
-        >
-          <span className="mr-1">📚</span>
-          Collection
-        </Link>
-      )}
-      <Link
-        to="/globe-view"
-        className="text-gray-300 hover:text-blue-400 font-medium transition duration-200 flex items-center mb-4 md:mb-0"
-      >
-        <span className="mr-1">🔄</span>
-        Globe View
-      </Link>
-      <Link
-        to="/about"
-        className="text-gray-300 hover:text-blue-400 font-medium transition duration-200 flex items-center mb-4 md:mb-0"
-      >
-        <span className="mr-1">ℹ️</span>
-        About Us
-      </Link>
-      <Link
-        to="/contact"
-        className="text-gray-300 hover:text-blue-400 font-medium transition duration-200 flex items-center"
-      >
-        <span className="mr-1">✉️</span>
-        Contact Us
-      </Link>
-    </>
-  );
+  const linkClasses =
+    'block px-4 py-2 text-gray-300 hover:text-blue-400 font-medium transition flex items-center';
 
   return (
-    <header className="bg-gray-800 shadow-lg">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+    <header className="bg-gray-800 shadow-lg fixed w-full z-30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Logo */}
-        <Link to="/" className="flex items-center group">
-          <div className="relative mr-3">
-            <FaGlobeAmericas className="text-3xl text-blue-400 group-hover:text-blue-300 transition-colors duration-200" />
-            <div className="absolute -inset-1 bg-blue-500 rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity duration-300" />
-          </div>
+        <Link to="/" className="flex items-center">
+          <FaGlobeAmericas className="text-3xl text-blue-400 mr-2" />
           <span className="text-xl font-bold text-white">COUNTRYWISE</span>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex space-x-8 items-center">{NavLinks}</nav>
+        {/* Desktop navigation */}
+        <nav className="hidden md:flex space-x-6 lg:space-x-8">
+          <Link to="/countries" className={linkClasses}>
+            <span className="mr-1">🌎</span> Countries
+          </Link>
+          {loggedIn && (
+            <Link to="/collection" className={linkClasses}>
+              <span className="mr-1">📚</span> Collection
+            </Link>
+          )}
+          <Link to="/globe-view" className={linkClasses}>
+            <span className="mr-1">🔄</span> Globe View
+          </Link>
+          <Link to="/about" className={linkClasses}>
+            <span className="mr-1">ℹ️</span> About Us
+          </Link>
+          <Link to="/contact" className={linkClasses}>
+            <span className="mr-1">✉️</span> Contact Us
+          </Link>
+        </nav>
 
-        {/* Auth button */}
+        {/* Desktop login/logout */}
         <div className="hidden md:flex items-center">
           {loggedIn ? (
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:from-red-700 hover:to-red-600 transition-all duration-200 flex items-center shadow-md"
+              className="ml-4 flex items-center px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:from-red-700 hover:to-red-600 transition"
             >
-              <FaSignOutAlt className="mr-2" />
-              Logout
+              <FaSignOutAlt className="mr-2" /> Logout
             </button>
           ) : (
             <Link
               to="/login"
-              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-200 flex items-center shadow-md"
+              onClick={() => setMenuOpen(false)}
+              className="ml-4 flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg hover:from-blue-700 hover:to-blue-600 transition"
             >
-              <FaSignInAlt className="mr-2" />
-              Login
+              <FaSignInAlt className="mr-2" /> Login
             </Link>
           )}
         </div>
 
         {/* Mobile menu button */}
         <button
-          className="md:hidden text-white text-2xl"
-          onClick={() => setMenuOpen((o) => !o)}
+          className="md:hidden text-white focus:outline-none"
+          onClick={toggleMenu}
           aria-label="Toggle menu"
         >
-          {menuOpen ? <FaTimes /> : <FaBars />}
+          {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
         </button>
       </div>
 
       {/* Mobile navigation */}
       {menuOpen && (
-        <div className="md:hidden bg-gray-800 px-4 pb-4">
-          <nav className="flex flex-col">
-            {NavLinks}
-            <div className="flex items-center mt-2">
-              {loggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-white font-medium flex items-center"
-                >
-                  <FaSignOutAlt className="mr-2" />
-                  Logout
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  className="w-full text-left px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-white font-medium flex items-center"
-                >
-                  <FaSignInAlt className="mr-2" />
-                  Login
-                </Link>
-              )}
-            </div>
-          </nav>
-        </div>
+        <nav className="md:hidden bg-gray-800">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            <Link
+              to="/countries"
+              onClick={() => setMenuOpen(false)}
+              className={linkClasses}
+            >
+              🌎 Countries
+            </Link>
+            {loggedIn && (
+              <Link
+                to="/collection"
+                onClick={() => setMenuOpen(false)}
+                className={linkClasses}
+              >
+                📚 Collection
+              </Link>
+            )}
+            <Link
+              to="/globe-view"
+              onClick={() => setMenuOpen(false)}
+              className={linkClasses}
+            >
+              🔄 Globe View
+            </Link>
+            <Link
+              to="/about"
+              onClick={() => setMenuOpen(false)}
+              className={linkClasses}
+            >
+              ℹ️ About Us
+            </Link>
+            <Link
+              to="/contact"
+              onClick={() => setMenuOpen(false)}
+              className={linkClasses}
+            >
+              ✉️ Contact Us
+            </Link>
+            {loggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-red-400 hover:text-red-600 transition flex items-center"
+              >
+                <FaSignOutAlt className="mr-2" /> Logout
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="px-4 py-2 text-blue-400 hover:text-blue-600 transition flex items-center"
+              >
+                <FaSignInAlt className="mr-2" /> Login
+              </Link>
+            )}
+          </div>
+        </nav>
       )}
     </header>
   );

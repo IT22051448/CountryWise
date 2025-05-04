@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-
 import AuthRequired from '@/components/collection/AuthRequired';
 import LoadingSpinner from '@/components/collection/LoadingSpinner';
 import ErrorView from '@/components/collection/ErrorView';
 import Tabs from '@/components/collection/Tabs';
 import VisitedSection from '@/components/collection/VisitedSection';
 import WishlistSection from '@/components/collection/WishlistSection';
+import { useToast } from '@/hooks/ToastContext';
 
 export default function Collection() {
   const token = useSelector((state) => state.auth.token);
   const isLoggedIn = Boolean(token);
   const API = import.meta.env.VITE_API_URL;
-
+  const { addToast } = useToast();
   const [visitedCountryNames, setVisitedCountryNames] = useState([]);
   const [wishlistCountryNames, setWishlistCountryNames] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +22,10 @@ export default function Collection() {
   useEffect(() => {
     if (!isLoggedIn) {
       setLoading(false);
+      addToast({
+        type: 'error',
+        message: 'Your will need to be logged in to access this feature!',
+      });
       return;
     }
 
@@ -71,6 +75,10 @@ export default function Collection() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
+      addToast({
+        type: 'success',
+        message: 'Visited countries updated successfully!',
+      });
       setVisitedCountryNames(data.visited || []);
     } catch (err) {
       setError(err.message);
@@ -92,6 +100,10 @@ export default function Collection() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
+      addToast({
+        type: 'success',
+        message: 'Wishlist countries updated successfully!',
+      });
       setWishlistCountryNames(data.wishlist || []);
     } catch (err) {
       setError(err.message);

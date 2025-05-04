@@ -19,7 +19,7 @@ jest.mock('react-icons/fi', () => ({
 jest.mock('@/hooks/useCountryData');
 
 describe('<CountryPage />', () => {
-  const mockUseCountryData = {
+  const baseData = {
     filteredCountries: [],
     loading: false,
     error: null,
@@ -43,7 +43,7 @@ describe('<CountryPage />', () => {
   };
 
   beforeEach(() => {
-    useCountryData.mockReturnValue(mockUseCountryData);
+    useCountryData.mockReturnValue({ ...baseData });
     render(<CountryPage />);
   });
 
@@ -51,52 +51,50 @@ describe('<CountryPage />', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the FiltersPanel component', () => {
+  it('renders the FiltersPanel placeholder', () => {
     expect(screen.getByTestId('filters-panel')).toBeInTheDocument();
   });
 
-  it('displays the page title and filter toggle button', () => {
+  it('renders the page title and filter toggle button', () => {
     expect(screen.getByText('Explore Countries')).toBeInTheDocument();
+
+    expect(screen.getByLabelText(/toggle filters/i)).toBeInTheDocument();
+
     expect(screen.getByTestId('filter-icon')).toBeInTheDocument();
   });
 
-  it('displays error message when error exists', () => {
-    const errorMessage = 'Failed to load countries';
-    useCountryData.mockReturnValue({
-      ...mockUseCountryData,
-      error: errorMessage,
-    });
-    render(<CountryPage />);
-    expect(screen.getByText(`Error: ${errorMessage}`)).toBeInTheDocument();
+  it('renders the country-list placeholder', () => {
+    expect(screen.getByTestId('country-list')).toBeInTheDocument();
   });
 
-  it('shows filters applied notification when filters are applied', () => {
-    useCountryData.mockReturnValue({
-      ...mockUseCountryData,
-      filtersApplied: true,
-    });
+  it('shows an error banner when error is non-null', () => {
+    useCountryData.mockReturnValue({ ...baseData, error: 'Oops!' });
+    render(<CountryPage />);
+    expect(screen.getByText('Error: Oops!')).toBeInTheDocument();
+  });
+
+  it('shows "Filters are applied" banner when filtersApplied is true', () => {
+    useCountryData.mockReturnValue({ ...baseData, filtersApplied: true });
     render(<CountryPage />);
     expect(screen.getByText('Filters are applied')).toBeInTheDocument();
     expect(screen.getByText('Clear all')).toBeInTheDocument();
   });
 
-  it('renders the CountryList component', () => {
-    expect(screen.getByTestId('country-list')).toBeInTheDocument();
+  it('toggles the filters panel when the filter button is clicked', () => {
+    const btn = screen.getByLabelText(/toggle filters/i);
+    fireEvent.click(btn);
+    expect(baseData.setShowFilters).toHaveBeenCalledWith(true);
   });
 
-  it('toggles filters panel when filter button is clicked', () => {
-    const filterButton = screen.getByText('Show Filters');
-    fireEvent.click(filterButton);
-    expect(mockUseCountryData.setShowFilters).toHaveBeenCalledWith(true);
-  });
-
-  it('displays the count of filtered countries', () => {
-    const mockDataWithCountries = {
-      ...mockUseCountryData,
+  it('displays the correct count of filtered countries', () => {
+    useCountryData.mockReturnValue({
+      ...baseData,
       filteredCountries: [{}, {}, {}],
-    };
-    useCountryData.mockReturnValue(mockDataWithCountries);
+    });
     render(<CountryPage />);
-    expect(screen.getByText('3 countries found')).toBeInTheDocument();
+
+    expect(
+      screen.getByText((content) => /\b3 countries\b/.test(content))
+    ).toBeInTheDocument();
   });
 });

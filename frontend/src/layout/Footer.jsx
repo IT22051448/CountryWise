@@ -2,20 +2,20 @@ import React from 'react';
 import {
   FaGithub,
   FaTwitter,
-  FaGlobe,
   FaFacebook,
   FaExternalLinkAlt,
+  FaGlobe,
 } from 'react-icons/fa';
 
 const Footer = () => {
   return (
     <footer className="bg-gray-800 text-white pt-8 pb-6">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-between space-y-6 md:space-y-0">
           {/* Brand */}
-          <div className="mb-6 md:mb-0 text-center md:text-left">
+          <div className="text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start">
-              <FaGlobe className="text-2xl mr-2 text-white" />
+              <FaGlobe className="text-2xl mr-2" />
               <span className="text-xl font-bold">CountryWise</span>
             </div>
             <p className="mt-2 text-sm text-white/80">
@@ -24,13 +24,13 @@ const Footer = () => {
           </div>
 
           {/* Attribution */}
-          <div className="mb-6 md:mb-0 text-center">
+          <div className="text-center md:text-left">
             <p className="text-sm font-medium mb-2">Powered by</p>
             <a
               href="https://restcountries.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition-all"
+              className="inline-flex items-center bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition"
             >
               <span className="mr-1">REST Countries API</span>
               <FaExternalLinkAlt className="text-xs" />
@@ -38,28 +38,21 @@ const Footer = () => {
           </div>
 
           {/* Social */}
-          <div className="flex space-x-4 justify-center md:justify-end">
-            <a
-              href="#"
-              className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all"
-              aria-label="GitHub"
-            >
-              <FaGithub />
-            </a>
-            <a
-              href="#"
-              className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all"
-              aria-label="Facebook"
-            >
-              <FaFacebook />
-            </a>
-            <a
-              href="#"
-              className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all"
-              aria-label="Twitter"
-            >
-              <FaTwitter />
-            </a>
+          <div className="flex space-x-4">
+            {[
+              { Icon: FaGithub, label: 'GitHub', href: '#' },
+              { Icon: FaFacebook, label: 'Facebook', href: '#' },
+              { Icon: FaTwitter, label: 'Twitter', href: '#' },
+            ].map(({ Icon, label, href }) => (
+              <a
+                key={label}
+                href={href}
+                aria-label={label}
+                className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition"
+              >
+                <Icon />
+              </a>
+            ))}
           </div>
         </div>
       </div>

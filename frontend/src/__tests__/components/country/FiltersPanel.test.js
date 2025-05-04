@@ -21,15 +21,15 @@ describe('FiltersPanel', () => {
     timezoneRange: [-12, 12],
     setTimezoneRange: jest.fn(),
     formatPopulation: jest.fn((value) => `${value / 1000000}M`),
+    formatTimezone: jest.fn((tz) => `UTC${tz >= 0 ? '+' : ''}${tz}`),
     applyFilters: jest.fn(),
     resetFilters: jest.fn(),
     showFilters: true,
     setShowFilters: jest.fn(),
   };
 
-  it('should render the FiltersPanel component correctly', () => {
+  it('renders all sections', () => {
     render(<FiltersPanel {...mockData} />);
-
     expect(screen.getByText('Filters')).toBeInTheDocument();
     expect(screen.getByText('Search Country')).toBeInTheDocument();
     expect(screen.getByText('Continent')).toBeInTheDocument();
@@ -38,59 +38,46 @@ describe('FiltersPanel', () => {
     expect(screen.getByText('Timezone Range')).toBeInTheDocument();
   });
 
-  it('should call setSearchTerm when search input is changed', () => {
+  it('calls setSearchTerm on country search input change', () => {
     render(<FiltersPanel {...mockData} />);
-
-    const searchInput = screen.getByPlaceholderText('Country name...');
-    fireEvent.change(searchInput, { target: { value: 'India' } });
-
+    const input = screen.getByPlaceholderText('Country name...');
+    fireEvent.change(input, { target: { value: 'India' } });
     expect(mockData.setSearchTerm).toHaveBeenCalledWith('India');
   });
 
-  it('should show the continent search and handle search term change', () => {
+  it('filters continent list when typing in its search box', () => {
     render(<FiltersPanel {...mockData} />);
-
-    const continentSearchInput = screen.getByPlaceholderText(
-      'Search continents...'
-    );
-    fireEvent.change(continentSearchInput, { target: { value: 'Euro' } });
+    const contInput = screen.getByPlaceholderText('Search continents...');
+    fireEvent.change(contInput, { target: { value: 'Euro' } });
 
     expect(screen.getByText('Europe')).toBeInTheDocument();
   });
 
-  it('should toggle continent selection when checkbox is clicked', () => {
+  it('toggles a continent when its checkbox is clicked', () => {
     render(<FiltersPanel {...mockData} />);
-
-    const continentCheckbox = screen.getByLabelText('Africa');
-    fireEvent.click(continentCheckbox);
-
+    const checkbox = screen.getByLabelText('Africa');
+    fireEvent.click(checkbox);
     expect(mockData.toggleContinent).toHaveBeenCalledWith('Africa');
   });
 
-  it('should toggle language selection when checkbox is clicked', () => {
+  it('toggles a language when its checkbox is clicked', () => {
     render(<FiltersPanel {...mockData} />);
-
-    const languageCheckbox = screen.getByLabelText('Spanish');
-    fireEvent.click(languageCheckbox);
-
+    const checkbox = screen.getByLabelText('Spanish');
+    fireEvent.click(checkbox);
     expect(mockData.toggleLanguage).toHaveBeenCalledWith('Spanish');
   });
 
-  it('should apply filters when the apply button is clicked', () => {
+  it('calls applyFilters when the Apply button is clicked', () => {
     render(<FiltersPanel {...mockData} />);
-
-    const applyButton = screen.getByText('Apply Filters');
-    fireEvent.click(applyButton);
-
+    const applyBtn = screen.getByText('Apply');
+    fireEvent.click(applyBtn);
     expect(mockData.applyFilters).toHaveBeenCalledTimes(1);
   });
 
-  it('should reset filters when the reset button is clicked', () => {
+  it('calls resetFilters when the Reset button is clicked', () => {
     render(<FiltersPanel {...mockData} />);
-
-    const resetButton = screen.getByText('Reset');
-    fireEvent.click(resetButton);
-
+    const resetBtn = screen.getByText('Reset');
+    fireEvent.click(resetBtn);
     expect(mockData.resetFilters).toHaveBeenCalledTimes(1);
   });
 });

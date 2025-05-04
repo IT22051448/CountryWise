@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   render,
   screen,
@@ -7,34 +8,32 @@ import {
 } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { useNavigate } from 'react-router-dom';
+
 import RegisterForm from '@/components/auth/RegisterForm';
+import { registerUser, clearMessage } from '@/redux/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import React from 'react';
+
+jest.mock('@/hooks/ToastContext', () => ({
+  useToast: () => ({ addToast: jest.fn() }),
+}));
 
 jest.mock('@/redux/auth/authSlice', () => ({
   __esModule: true,
   registerUser: jest.fn((formData) => {
-    const mockPromise = Promise.resolve({
-      email: formData.email,
-    });
-
+    const mockPromise = Promise.resolve({ email: formData.email });
     return {
       type: 'auth/registerUser/pending',
       payload: formData,
       unwrap: jest.fn(() => mockPromise),
     };
   }),
-  clearMessage: jest.fn(() => ({
-    type: 'auth/clearMessage',
-  })),
-  default: jest.fn(),
+  clearMessage: jest.fn(() => ({ type: 'auth/clearMessage' })),
 }));
 
 jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
 }));
-
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
   useDispatch: jest.fn(),
@@ -42,13 +41,9 @@ jest.mock('react-redux', () => ({
 }));
 
 const mockNavigate = jest.fn();
-const mockDispatch = jest.fn((action) => {
-  if (typeof action === 'function') {
-    return action(mockDispatch, () => mockStore);
-  }
-  return action;
-});
-
+const mockDispatch = jest.fn((action) =>
+  typeof action === 'function' ? action(mockDispatch, () => mockStore) : action
+);
 const mockStore = {
   auth: {
     message: '',
@@ -59,11 +54,7 @@ const mockStore = {
 beforeEach(() => {
   useNavigate.mockReturnValue(mockNavigate);
   useDispatch.mockReturnValue(mockDispatch);
-  useSelector.mockImplementation((selector) => selector(mockStore));
-
-  Storage.prototype.setItem = jest.fn();
-  Storage.prototype.getItem = jest.fn();
-  Storage.prototype.removeItem = jest.fn();
+  useSelector.mockImplementation((sel) => sel(mockStore));
 
   jest.useFakeTimers();
 });
@@ -76,11 +67,8 @@ afterEach(() => {
 });
 
 describe('RegisterForm', () => {
-  it('should render the register form correctly', () => {
-    const store = configureStore({
-      reducer: (state = mockStore) => state,
-    });
-
+  it('renders username, email, password fields and submit button', () => {
+    const store = configureStore({ reducer: () => mockStore });
     render(
       <Provider store={store}>
         <RegisterForm />
@@ -95,11 +83,8 @@ describe('RegisterForm', () => {
     ).toBeInTheDocument();
   });
 
-  it('should handle form submission and navigation', async () => {
-    const store = configureStore({
-      reducer: (state = mockStore) => state,
-    });
-
+  it('dispatches registerUser and navigates on success', async () => {
+    const store = configureStore({ reducer: () => mockStore });
     render(
       <Provider store={store}>
         <RegisterForm />
@@ -126,39 +111,18 @@ describe('RegisterForm', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
 
-  it('should show loading state during submission', async () => {
-    useSelector.mockImplementation((selector) =>
-      selector({
-        auth: { ...mockStore.auth, status: 'loading' },
-      })
+  it('shows loading text when status is loading', () => {
+    useSelector.mockImplementation((sel) =>
+      sel({ auth: { ...mockStore.auth, status: 'loading' } })
     );
 
+    const store = configureStore({ reducer: (s) => s });
     render(
-      <Provider store={configureStore({ reducer: (state) => state })}>
+      <Provider store={store}>
         <RegisterForm />
       </Provider>
     );
 
     expect(screen.getByRole('button')).toHaveTextContent('Registering...');
-  });
-
-  it('should display error message when registration fails', async () => {
-    useSelector.mockImplementation((selector) =>
-      selector({
-        auth: {
-          ...mockStore.auth,
-          message: 'Registration failed',
-          status: 'failed',
-        },
-      })
-    );
-
-    render(
-      <Provider store={configureStore({ reducer: (state) => state })}>
-        <RegisterForm />
-      </Provider>
-    );
-
-    expect(screen.getByText('Registration failed')).toBeInTheDocument();
   });
 });

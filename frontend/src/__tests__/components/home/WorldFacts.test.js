@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import WorldFacts from '@/components/home/WorldFacts';
 
@@ -20,12 +20,18 @@ jest.mock('@/data/homeContent', () => ({
   ],
 }));
 
+const mockAddToast = jest.fn();
+jest.mock('@/hooks/ToastContext', () => ({
+  useToast: () => ({ addToast: mockAddToast }),
+}));
+
 describe('WorldFacts component', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     render(<WorldFacts />);
   });
 
-  it('renders the section heading and subtitle', () => {
+  it('shows heading and subtitle', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: /Amazing World Facts/i })
     ).toBeInTheDocument();
@@ -36,35 +42,35 @@ describe('WorldFacts component', () => {
     ).toBeInTheDocument();
   });
 
-  it('displays each fact text and corresponding image', () => {
+  it('renders each fact with image and text', () => {
     expect(
       screen.getByText(
-        /The Pacific Ocean is larger than all of Earth’s land combined./i
+        /The Pacific Ocean is larger than all of Earth’s land combined\./i
       )
     ).toBeInTheDocument();
-    const img1 = screen.getByAltText('Fact 1');
-    expect(img1).toHaveAttribute('src', 'pacific.jpg');
+    expect(screen.getByAltText('Fact 1')).toHaveAttribute('src', 'pacific.jpg');
 
     expect(
-      screen.getByText(/Mount Everest grows about 4 millimeters every year./i)
+      screen.getByText(/Mount Everest grows about 4 millimeters every year\./i)
     ).toBeInTheDocument();
-    const img2 = screen.getByAltText('Fact 2');
-    expect(img2).toHaveAttribute('src', 'everest.jpg');
+    expect(screen.getByAltText('Fact 2')).toHaveAttribute('src', 'everest.jpg');
   });
 
-  it('renders a source line when source is provided but omits when null', () => {
-    expect(
-      screen.getByText(/Source:/i, { selector: 'div' })
-    ).toBeInTheDocument();
+  it('only shows source when provided', () => {
+    const sources = screen.getAllByText(/Source:/i);
+    expect(sources).toHaveLength(1);
     expect(screen.getByText(/National Geographic/i)).toBeInTheDocument();
-
-    const sourceElements = screen.queryAllByText(/Source:/i);
-    expect(sourceElements).toHaveLength(1);
   });
 
-  it('renders the "Explore More Facts" button', () => {
+  it('renders the Explore button and fires toast on click', () => {
     const btn = screen.getByRole('button', { name: /Explore More Facts/i });
     expect(btn).toBeInTheDocument();
-    expect(btn).toHaveClass('bg-gradient-to-r');
+
+    fireEvent.click(btn);
+    expect(mockAddToast).toHaveBeenCalledTimes(1);
+    expect(mockAddToast).toHaveBeenCalledWith({
+      type: 'info',
+      message: 'Apologies, this feature is not available yet!',
+    });
   });
 });

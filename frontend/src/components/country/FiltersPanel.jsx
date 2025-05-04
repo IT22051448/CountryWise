@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiSearch, FiX, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 const FiltersPanel = ({
@@ -15,6 +15,7 @@ const FiltersPanel = ({
   timezoneRange,
   setTimezoneRange,
   formatPopulation,
+  formatTimezone,
   applyFilters,
   resetFilters,
   showFilters,
@@ -32,9 +33,7 @@ const FiltersPanel = ({
 
   useEffect(() => {
     if (searchTerm.trim() !== '') {
-      const timer = setTimeout(() => {
-        applyFilters();
-      }, 300);
+      const timer = setTimeout(() => applyFilters(), 300);
       return () => clearTimeout(timer);
     }
   }, [searchTerm]);
@@ -58,292 +57,244 @@ const FiltersPanel = ({
 
   return (
     <div
-      className={`${
-        showFilters ? 'fixed inset-0 bg-white z-40 overflow-auto p-4' : 'hidden'
-      } lg:static lg:block lg:w-1/4 p-4 bg-white border-r border-gray-200 transition-transform`}
+      className={`
+        fixed lg:sticky top-0 left-0 z-20 bg-white border-r border-gray-200
+        w-full sm:w-80 md:w-96 lg:w-80 xl:w-96 h-screen lg:h-auto
+        transform transition-transform duration-300 ease-in-out
+        ${showFilters ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        shadow-lg lg:shadow-none
+      `}
     >
-      <div className="sticky top-4 flex flex-col h-[calc(100vh-32px)]">
-        <div className="flex justify-between items-center">
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <div className="flex mt-14 justify-between items-center p-4 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-800 flex items-center">
             <FiSearch className="mr-2" /> Filters
           </h2>
           <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="block lg:hidden ml-auto text-gray-500 hover:text-blue-600"
+            onClick={() => setShowFilters(false)}
+            className="lg:hidden text-gray-500 hover:text-blue-600 p-1"
+            aria-label="Close filters"
           >
-            {showFilters ? <FiChevronUp /> : <FiChevronDown />}
+            <FiX size={24} />
           </button>
         </div>
 
-        <div
-          className={`${
-            !showFilters && 'hidden'
-          } lg:block flex-1 overflow-y-auto pr-2 custom-scroll`}
-        >
-          {/* Search */}
-          <div className="mt-6">
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scroll">
+          {/* Search Country */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Search Country
             </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiSearch className="h-4 w-4 text-gray-400" />
-              </div>
+            <div className="relative">
+              <FiSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Country name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-8 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                className="w-full pl-10 pr-8 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label="Clear country search"
                 >
-                  <FiX className="h-4 w-4 text-gray-400 hover:text-gray-600 transition" />
+                  <FiX size={18} />
                 </button>
               )}
             </div>
           </div>
 
           {/* Continents */}
-          <div className="mt-6">
+          <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-gray-700">
                 Continent
               </label>
               <span className="text-xs text-gray-500">
                 {selectedContinents.length} selected
               </span>
             </div>
-            <div className="relative rounded-md shadow-sm mb-2">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiSearch className="h-4 w-4 text-gray-400" />
-              </div>
+            <div className="relative mb-2">
+              <FiSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search continents..."
                 value={continentSearch}
                 onChange={(e) => setContinentSearch(e.target.value)}
-                className="block w-full pl-10 pr-8 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                className="w-full pl-10 pr-8 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {continentSearch && (
                 <button
                   onClick={() => setContinentSearch('')}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label="Clear continent search"
                 >
-                  <FiX className="h-4 w-4 text-gray-400 hover:text-gray-600 transition" />
+                  <FiX size={18} />
                 </button>
               )}
             </div>
-            <div className="max-h-40 overflow-y-auto space-y-2 grid grid-cols-2 gap-2 p-1 custom-scroll">
+            <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-1 custom-scroll">
               {filteredContinents.map((cont) => (
-                <div key={cont} className="flex items-center">
+                <label
+                  key={cont}
+                  htmlFor={`continent-${cont}`}
+                  className="flex items-center space-x-2 text-sm text-gray-700 truncate"
+                >
                   <input
-                    type="checkbox"
                     id={`continent-${cont}`}
+                    type="checkbox"
                     checked={selectedContinents.includes(cont)}
                     onChange={() => toggleContinent(cont)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-600 rounded"
                   />
-                  <label
-                    htmlFor={`continent-${cont}`}
-                    className="ml-2 text-sm text-gray-700 truncate cursor-pointer"
-                  >
-                    {cont}
-                  </label>
-                </div>
+                  <span>{cont}</span>
+                </label>
               ))}
             </div>
           </div>
 
           {/* Languages */}
-          <div className="mt-6">
+          <div>
             <div className="flex justify-between items-center mb-1">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-gray-700">
                 Language
               </label>
               <span className="text-xs text-gray-500">
                 {selectedLanguages.length} selected
               </span>
             </div>
-            <div className="relative rounded-md shadow-sm mb-2">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiSearch className="h-4 w-4 text-gray-400" />
-              </div>
+            <div className="relative mb-2">
+              <FiSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search languages..."
                 value={languageSearch}
                 onChange={(e) => setLanguageSearch(e.target.value)}
-                className="block w-full pl-10 pr-8 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                className="w-full pl-10 pr-8 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {languageSearch && (
                 <button
                   onClick={() => setLanguageSearch('')}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label="Clear language search"
                 >
-                  <FiX className="h-4 w-4 text-gray-400 hover:text-gray-600 transition" />
+                  <FiX size={18} />
                 </button>
               )}
             </div>
-            <div className="max-h-40 overflow-y-auto space-y-2 grid grid-cols-2 gap-2 p-1 custom-scroll">
+            <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-1 custom-scroll">
               {filteredLanguages.map((lang) => (
-                <div key={lang} className="flex items-center">
+                <label
+                  key={lang}
+                  htmlFor={`language-${lang}`}
+                  className="flex items-center space-x-2 text-sm text-gray-700 truncate"
+                >
                   <input
-                    type="checkbox"
                     id={`language-${lang}`}
+                    type="checkbox"
                     checked={selectedLanguages.includes(lang)}
                     onChange={() => toggleLanguage(lang)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-600 rounded"
                   />
-                  <label
-                    htmlFor={`language-${lang}`}
-                    className="ml-2 text-sm text-gray-700 truncate cursor-pointer"
-                  >
-                    {lang}
-                  </label>
-                </div>
+                  <span>{lang}</span>
+                </label>
               ))}
             </div>
           </div>
 
           {/* Population */}
-          <div className="mt-6">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Population Range
             </label>
             <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">
-                    Minimum
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={populationRange[0]}
-                      onChange={(e) =>
-                        setPopulationRange([
-                          +e.target.value,
-                          populationRange[1],
-                        ])
-                      }
-                      className="block w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
-                    >
-                      {populationOptions.map((opt) => (
-                        <option key={`min-${opt.value}`} value={opt.value}>
-                          {formatPopulation(opt.value)}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <FiChevronDown className="h-4 w-4 text-gray-400" />
+                {['Minimum', 'Maximum'].map((lbl, idx) => (
+                  <div key={lbl}>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                      {lbl}
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={populationRange[idx]}
+                        onChange={(e) =>
+                          setPopulationRange((prev) =>
+                            idx === 0
+                              ? [+e.target.value, prev[1]]
+                              : [prev[0], +e.target.value]
+                          )
+                        }
+                        className="w-full pl-3 pr-8 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      >
+                        {populationOptions.map((opt) => (
+                          <option key={`${lbl}-${opt.value}`} value={opt.value}>
+                            {formatPopulation(opt.value)}
+                          </option>
+                        ))}
+                      </select>
+                      <FiChevronDown className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400" />
                     </div>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">
-                    Maximum
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={populationRange[1]}
-                      onChange={(e) =>
-                        setPopulationRange([
-                          populationRange[0],
-                          +e.target.value,
-                        ])
-                      }
-                      className="block w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
-                    >
-                      {populationOptions.map((opt) => (
-                        <option key={`max-${opt.value}`} value={opt.value}>
-                          {formatPopulation(opt.value)}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <FiChevronDown className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Timezones */}
-          <div className="mt-6">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Timezone Range
             </label>
             <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">
-                    Minimum
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={timezoneRange[0]}
-                      onChange={(e) =>
-                        setTimezoneRange([+e.target.value, timezoneRange[1]])
-                      }
-                      className="block w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
-                    >
-                      {timezoneOptions.map((opt) => (
-                        <option key={`min-${opt.value}`} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <FiChevronDown className="h-4 w-4 text-gray-400" />
+                {['Minimum', 'Maximum'].map((lbl, idx) => (
+                  <div key={lbl}>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                      {lbl}
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={timezoneRange[idx]}
+                        onChange={(e) =>
+                          setTimezoneRange((prev) =>
+                            idx === 0
+                              ? [+e.target.value, prev[1]]
+                              : [prev[0], +e.target.value]
+                          )
+                        }
+                        className="w-full pl-3 pr-8 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      >
+                        {timezoneOptions.map((opt) => (
+                          <option key={`${lbl}-${opt.value}`} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <FiChevronDown className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400" />
                     </div>
                   </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">
-                    Maximum
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={timezoneRange[1]}
-                      onChange={(e) =>
-                        setTimezoneRange([timezoneRange[0], +e.target.value])
-                      }
-                      className="block w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
-                    >
-                      {timezoneOptions.map((opt) => (
-                        <option key={`max-${opt.value}`} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <FiChevronDown className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Actions */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="flex justify-between space-x-3">
+          {/* Actions */}
+          <div className="pt-4 border-t border-gray-200 flex space-x-3 mb-8">
             <button
               onClick={resetFilters}
-              className="flex-1 py-2.5 bg-gray-300 hover:bg-gray-400 border border-gray-300 rounded-md text-sm font-medium text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
+              className="flex-1 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium transition"
             >
               Reset
             </button>
             <button
               onClick={applyFilters}
-              className="flex-1 py-2.5 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 flex items-center justify-center"
+              className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition"
             >
-              Apply Filters
+              Apply
             </button>
           </div>
         </div>

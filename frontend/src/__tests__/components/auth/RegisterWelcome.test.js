@@ -1,15 +1,16 @@
-import { render, screen, cleanup } from '@testing-library/react';
-import RegisterWelcome from '@/components/auth/RegisterWelcome';
 import React from 'react';
+import { render, screen, cleanup } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import RegisterWelcome from '@/components/auth/RegisterWelcome';
 
-afterEach(() => {
-  cleanup();
-});
+afterEach(cleanup);
 
-describe('RegisterWelcome', () => {
-  it('should render the RegisterWelcome component correctly', () => {
+describe('RegisterWelcome component', () => {
+  beforeEach(() => {
     render(<RegisterWelcome />);
+  });
 
+  it('renders the heading, paragraph, and SVG icon', () => {
     expect(screen.getByText('Discover Your World')).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -19,54 +20,46 @@ describe('RegisterWelcome', () => {
     expect(screen.getByTestId('welcome-icon')).toBeInTheDocument();
   });
 
-  it('should have the correct structure for the SVG icon', () => {
-    render(<RegisterWelcome />);
-
-    const svgIcon = screen.getByTestId('welcome-icon');
-
-    expect(svgIcon).toHaveClass('w-16');
-    expect(svgIcon).toHaveClass('h-16');
-    expect(svgIcon).toHaveClass('mx-auto');
-    expect(svgIcon).toHaveClass('text-white');
+  it('container has the correct responsive classes', () => {
+    const container = screen.getByTestId('welcome-container');
+    expect(container).toHaveClass('hidden');
+    expect(container).toHaveClass('sm:flex');
+    expect(container).toHaveClass('sm:w-1/2');
+    expect(container).toHaveClass('lg:w-2/5');
+    expect(container).toHaveClass('bg-gradient-to-br');
+    expect(container).toHaveClass('from-blue-600');
+    expect(container).toHaveClass('to-blue-400');
+    expect(container).toHaveClass('p-6');
+    expect(container).toHaveClass('sm:p-8');
+    expect(container).toHaveClass('items-center');
+    expect(container).toHaveClass('justify-center');
   });
 
-  it('should display the heading text correctly', () => {
-    render(<RegisterWelcome />);
+  it('SVG icon has expected size and color classes', () => {
+    const icon = screen.getByTestId('welcome-icon');
+    expect(icon).toHaveClass('w-12');
+    expect(icon).toHaveClass('h-12');
+    expect(icon).toHaveClass('sm:w-16');
+    expect(icon).toHaveClass('sm:h-16');
+    expect(icon).toHaveClass('mx-auto');
+    expect(icon).toHaveClass('text-white');
+    expect(icon).toHaveAttribute('viewBox', '0 0 24 24');
+  });
 
+  it('heading and paragraph use the right text-size classes', () => {
     const heading = screen.getByText('Discover Your World');
-
-    expect(heading).toBeInTheDocument();
     expect(heading).toHaveClass('text-white');
-    expect(heading).toHaveClass('text-2xl');
+    expect(heading).toHaveClass('text-xl');
+    expect(heading).toHaveClass('sm:text-2xl');
     expect(heading).toHaveClass('font-bold');
     expect(heading).toHaveClass('mt-4');
-  });
-
-  it('should display the paragraph text correctly', () => {
-    render(<RegisterWelcome />);
 
     const paragraph = screen.getByText(
       'Join CountryWise to explore countries, cultures, and travel insights.'
     );
-
-    expect(paragraph).toBeInTheDocument();
     expect(paragraph).toHaveClass('text-white');
     expect(paragraph).toHaveClass('mt-2');
-  });
-
-  it('should render the container div with the correct classes', () => {
-    render(<RegisterWelcome />);
-
-    const container = screen.getByTestId('welcome-container');
-
-    expect(container).toHaveClass('hidden');
-    expect(container).toHaveClass('md:flex');
-    expect(container).toHaveClass('md:w-1/2');
-    expect(container).toHaveClass('bg-gradient-to-br');
-    expect(container).toHaveClass('from-blue-600');
-    expect(container).toHaveClass('to-blue-400');
-    expect(container).toHaveClass('p-8');
-    expect(container).toHaveClass('items-center');
-    expect(container).toHaveClass('justify-center');
+    expect(paragraph).toHaveClass('text-sm');
+    expect(paragraph).toHaveClass('sm:text-base');
   });
 });

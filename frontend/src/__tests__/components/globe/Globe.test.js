@@ -15,7 +15,7 @@ jest.mock('@/api/restCountriesApi', () => ({
 jest.mock('@/components/globe/CountrySearch', () => {
   const React = require('react');
   return ({ onSearch, message }) => (
-    <div>
+    <div data-testid="search-panel">
       <button onClick={onSearch}>Search</button>
       {message && <div data-testid="message">{message}</div>}
     </div>
@@ -48,69 +48,82 @@ describe('Globe component', () => {
   let fetchByNameMock;
   const { useLazyGetCountriesByNameQuery } = require('@/api/restCountriesApi');
 
+  beforeAll(() => {
+    window.matchMedia = jest.fn().mockImplementation((q) => ({
+      matches: true,
+      media: q,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+  });
+
   beforeEach(() => {
     cleanup();
     fetchByNameMock = jest.fn();
-
     useLazyGetCountriesByNameQuery.mockReturnValue([
       fetchByNameMock,
       { isLoading: false },
     ]);
   });
 
-  it('shows the select modal when multiple matches are returned', async () => {
+  it('toggles search panel and details panel on mobile', () => {
+    render(<Globe />);
+
+    expect(screen.getByTestId('search-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('details')).toBeInTheDocument();
+
+    const toggleSearch = screen.getByLabelText('Toggle search panel');
+    fireEvent.click(toggleSearch);
+    expect(screen.queryByTestId('search-panel')).toBeNull();
+
+    const toggleDetails = screen.getByLabelText('Toggle details panel');
+    fireEvent.click(toggleDetails);
+    expect(screen.queryByTestId('details')).toBeNull();
+  });
+
+  it('shows modal when multiple matches returned', async () => {
     const data = [
       { cca3: 'A', name: { common: 'A' }, latlng: [1, 2] },
       { cca3: 'B', name: { common: 'B' }, latlng: [3, 4] },
     ];
-    fetchByNameMock.mockReturnValue({
-      unwrap: () => Promise.resolve(data),
-    });
+    fetchByNameMock.mockReturnValue({ unwrap: () => Promise.resolve(data) });
 
     render(<Globe />);
-
     fireEvent.click(screen.getByText('Search'));
 
     await waitFor(() => {
       expect(screen.getByTestId('modal')).toHaveTextContent(
         JSON.stringify(data)
       );
-
       expect(screen.getByTestId('message')).toHaveTextContent(
         'Multiple countries match. Please select.'
       );
 
       expect(screen.getByTestId('details')).toHaveTextContent('null');
-      const globe = screen.getByTestId('globe');
-      expect(globe).toHaveTextContent('"showMarker":false');
+
+      expect(screen.getByTestId('globe')).toHaveTextContent(
+        '"showMarker":false'
+      );
     });
   });
 
-  it('sets marker and details when exactly one match is returned', async () => {
-    const single = {
-      cca3: 'X',
-      name: { common: 'X' },
-      latlng: [5, 6],
-    };
+  it('sets marker and details when a single match returned', async () => {
+    const single = { cca3: 'X', name: { common: 'X' }, latlng: [5, 6] };
     fetchByNameMock.mockReturnValue({
       unwrap: () => Promise.resolve([single]),
     });
 
     render(<Globe />);
-
     fireEvent.click(screen.getByText('Search'));
 
     await waitFor(() => {
       expect(screen.queryByTestId('modal')).toBeNull();
-
       expect(screen.getByTestId('message')).toHaveTextContent(
         'Location found!'
       );
-
       expect(screen.getByTestId('details')).toHaveTextContent(
         JSON.stringify(single)
       );
-
       const globe = screen.getByTestId('globe');
       expect(globe).toHaveTextContent('"showMarker":true');
       expect(globe).toHaveTextContent(`"countryCoordinates":{"lat":5,"lng":6}`);
@@ -118,36 +131,30 @@ describe('Globe component', () => {
     });
   });
 
-  it('shows "Country not found!" when no matches are returned', async () => {
-    fetchByNameMock.mockReturnValue({
-      unwrap: () => Promise.resolve([]),
-    });
+  it('shows "Country not found!" when no matches returned', async () => {
+    fetchByNameMock.mockReturnValue({ unwrap: () => Promise.resolve([]) });
 
     render(<Globe />);
-
     fireEvent.click(screen.getByText('Search'));
 
     await waitFor(() => {
       expect(screen.queryByTestId('modal')).toBeNull();
-
       expect(screen.getByTestId('message')).toHaveTextContent(
         'Country not found!'
       );
-
       expect(screen.getByTestId('details')).toHaveTextContent('null');
-
-      const globe = screen.getByTestId('globe');
-      expect(globe).toHaveTextContent('"showMarker":false');
+      expect(screen.getByTestId('globe')).toHaveTextContent(
+        '"showMarker":false'
+      );
     });
   });
 
-  it('shows an error message when the fetch throws', async () => {
+  it('shows error message if fetch throws', async () => {
     fetchByNameMock.mockReturnValue({
-      unwrap: () => Promise.reject(new Error('Network error')),
+      unwrap: () => Promise.reject(new Error('fail')),
     });
 
     render(<Globe />);
-
     fireEvent.click(screen.getByText('Search'));
 
     await waitFor(() => {
